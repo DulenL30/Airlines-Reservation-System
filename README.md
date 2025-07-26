@@ -126,20 +126,121 @@ FlightReservationSystem/
 ### `__init__()`
 Initializes the flight reservation system with empty lists for flights, customers, and bookings. Sets up default staff credentials and loads three pre-configured flights for the next day.
 
+```python
+def __init__(self):
+    self.flights = []
+    self.customers = []
+    self.bookings = []
+    
+    # Default credentials
+    self.username = "Staff"
+    self.password = "Cloud123"
+    
+    # Initialize default flights
+    self.initialize_default_flights()
+```
+
 ### `initialize_default_flights()`
 Creates three default flights (JFK001, JFK002, JFK003) departing tomorrow to Orlando, Miami, and Los Angeles respectively. Each flight has 20 economy and 20 business class seats.
+
+```python
+def initialize_default_flights(self):
+    tomorrow = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    
+    default_flights = [
+        {
+            'flight_no': "JFK001",
+            'departure_from': "JFK",
+            'arrival_to': "Orlando",
+            'departure_date': tomorrow,
+            'departure_time': "06:30",
+            'economy_seats': 20,
+            'business_seats': 20,
+            'economy_fare': 500,
+            'business_fare': 1000,
+            'economy_booked': 0,
+            'business_booked': 0
+        },
+        # Similar structure for JFK002 and JFK003
+    ]
+    
+    self.flights.extend(default_flights)
+```
 
 ### `display_header(title)`
 Displays a consistent formatted header across all system screens with the CloudFare Airlines branding and the current screen title.
 
+```python
+def display_header(self, title):
+    print("\n" + "="*50)
+    print(f"CloudFare Airlines - {title}")
+    print("="*50)
+```
+
 ### `validate_date(date_str)` & `validate_time(time_str)`
 Input validation functions that ensure dates follow YYYY-MM-DD format and times follow HH:MM format using datetime parsing.
+
+```python
+def validate_date(self, date_str):
+    try:
+        datetime.datetime.strptime(date_str, "%Y-%m-%d")
+        return True
+    except ValueError:
+        return False
+
+def validate_time(self, time_str):
+    try:
+        datetime.datetime.strptime(time_str, "%H:%M")
+        return True
+    except ValueError:
+        return False
+```
 
 ### `staff_login()`
 Handles secure staff authentication. Prompts for username and password, validates against stored credentials, and provides retry options on failed attempts.
 
+```python
+def staff_login(self):
+    self.display_header("Staff Login")
+    
+    while True:
+        username = input("Username: ").strip()
+        password = input("Password: ").strip()
+        
+        if username == self.username and password == self.password:
+            print("\nLogin successful!")
+            return True
+        
+        choice = input("Login failed. Try again? (Yes/No): ").strip().lower()
+        if choice not in ['yes', 'y']:
+            return False
+```
+
 ### `main_menu()`
 Core navigation hub that displays the main menu options and routes user selections to appropriate functions. Includes error handling for invalid menu choices.
+
+```python
+def main_menu(self):
+    while True:
+        self.display_header("Main Menu")
+        print("1. Add flight details")
+        print("2. Register a customer")
+        print("3. Search for available flights")
+        print("4. Book a flight")
+        print("5. View booking details")
+        print("6. Exit")
+        
+        try:
+            choice = int(input("\nEnter your choice (1-6): "))
+            
+            if choice == 1:
+                self.add_flight()
+            elif choice == 2:
+                self.register_customer()
+            # ... other menu options
+        except ValueError:
+            print("Please enter a valid number!")
+```
 
 ### `add_flight()`
 Comprehensive flight creation function with step-by-step validation:
@@ -150,6 +251,27 @@ Comprehensive flight creation function with step-by-step validation:
 - Collects seat and fare information
 - Prevents duplicate flight numbers
 
+```python
+def add_flight(self):
+    self.display_header("Add Flight Details")
+    
+    # Flight number validation with while loop
+    flight_no = ""
+    while True:
+        flight_no = input("Flight No (JFKxxx): ").strip().upper()
+        if not (flight_no.startswith('JFK') and flight_no[3:].isdigit() and len(flight_no) == 6):
+            print("Invalid flight number format. Must be JFK followed by 3 digits")
+            continue
+        
+        if any(f['flight_no'] == flight_no for f in self.flights):
+            print("Flight number already exists!")
+            continue
+        
+        break  # Valid and unique flight number
+    
+    # Similar validation patterns for other inputs...
+```
+
 ### `register_customer()`
 Customer registration system with complete validation:
 - Validates customer ID format (Cxxx)
@@ -157,6 +279,27 @@ Customer registration system with complete validation:
 - Validates passport information
 - Ensures unique customer IDs
 - Validates telephone numbers (minimum 7 digits)
+
+```python
+def register_customer(self):
+    self.display_header("Register Customer")
+    
+    # Customer ID validation with while loop
+    customer_id = ""
+    while True:
+        customer_id = input("Customer ID (Cxxx): ").strip().upper()
+        if not (customer_id.startswith('C') and customer_id[1:].isdigit() and len(customer_id) == 4):
+            print("Invalid format. Must be C followed by 3 digits")
+            continue
+        
+        if any(c['customer_id'] == customer_id for c in self.customers):
+            print("Customer ID already exists!")
+            continue
+        
+        break
+    
+    # Collect other customer details with validation...
+```
 
 ### `search_flights()`
 Flexible flight search engine that allows filtering by:
@@ -167,6 +310,33 @@ Flexible flight search engine that allows filtering by:
 - Displays real-time seat availability
 - Supports partial search criteria
 
+```python
+def search_flights(self):
+    self.display_header("Search Available Flights")
+    
+    # Collect search criteria with validation
+    departure_date = input("Departure Date (YYYY-MM-DD, press Enter to skip): ").strip()
+    departure_time = input("Departure Time (HH:MM, press Enter to skip): ").strip()
+    destination = input("Destination (Orlando/Miami/Los Angeles, press Enter to skip): ").strip()
+    
+    # Find matching flights
+    matching_flights = []
+    for flight in self.flights:
+        match = True
+        
+        if departure_date and flight['departure_date'] != departure_date:
+            match = False
+        if departure_time and flight['departure_time'] != departure_time:
+            match = False
+        if destination and flight['arrival_to'] != destination:
+            match = False
+        
+        if match:
+            matching_flights.append(flight)
+    
+    # Display results in formatted table...
+```
+
 ### `book_flight()`
 Complete booking process with validation:
 - Flight selection and verification
@@ -176,6 +346,34 @@ Complete booking process with validation:
 - Booking confirmation with unique ID generation
 - Automatic seat count updates
 
+```python
+def book_flight(self):
+    self.display_header("Book a Flight")
+    
+    # Flight selection
+    flight_no = input("Flight No (or 'exit' to cancel): ").strip().upper()
+    flight = next((f for f in self.flights if f['flight_no'] == flight_no), None)
+    
+    if not flight:
+        print("Flight not found!")
+        return
+    
+    # Customer verification
+    passport_no = input("Passport Number: ").strip()
+    customer = next((c for c in self.customers if c['passport_no'] == passport_no), None)
+    
+    # Create booking with unique ID
+    booking_id = f"B{len(self.bookings) + 1:03d}"
+    new_booking = {
+        'booking_id': booking_id,
+        'flight_no': flight['flight_no'],
+        'customer_id': customer['customer_id'],
+        # ... other booking details
+    }
+    
+    self.bookings.append(new_booking)
+```
+
 ### `view_bookings()`
 Comprehensive booking display system:
 - Groups bookings by departure date
@@ -183,8 +381,46 @@ Comprehensive booking display system:
 - Displays customer names, flight details, and fares
 - Organized tabular format for easy reading
 
+```python
+def view_bookings(self):
+    self.display_header("View Bookings")
+    
+    if not self.bookings:
+        print("No bookings found.")
+        return
+    
+    # Group bookings by date
+    bookings_by_date = {}
+    for booking in self.bookings:
+        date = booking['departure_date']
+        if date not in bookings_by_date:
+            bookings_by_date[date] = []
+        bookings_by_date[date].append(booking)
+    
+    # Display formatted booking information
+    for date, date_bookings in bookings_by_date.items():
+        print(f"\nDeparture Date: {date}")
+        print("-" * 80)
+        # Print tabular booking details...
+```
+
 ### `main()`
 Application entry point that initializes the system, displays welcome message, handles staff login, and launches the main menu interface.
+
+```python
+def main():
+    system = FlightReservationSystem()
+    
+    print("\n" + "="*50)
+    print("   CloudFare Airlines Flight Reservation System")
+    print("="*50)
+    
+    if system.staff_login():
+        system.main_menu()
+
+if __name__ == "__main__":
+    main()
+```
 
 ## 🛡️ Error Handling & Validation
 
@@ -208,5 +444,7 @@ Application entry point that initializes the system, displays welcome message, h
 - **Architecture**: Object-Oriented Design
 - **Data Storage**: In-memory (runtime persistence)
 - **Interface**: Command-Line Interface (CLI)
+
+
 
 
