@@ -1,6 +1,7 @@
 import datetime
 from typing import List, Dict
 
+
 class FlightReservationSystem:
     def __init__(self):
         self.flights = []
