@@ -1,8 +1,8 @@
-# Airlines Reservation System
+# Flight Reservation System
 
 ## 🎯 Project Overview
 
-Welcome aboard CloudFare Airlines! This comprehensive flight reservation system is your one-stop solution for managing flights, customers, and bookings. Built with Python's elegance and designed with user experience in mind, this system handles everything from flight scheduling to customer management with style.
+This comprehensive flight reservation system is your one-stop solution for managing flights, customers, and bookings. Built with Python's elegance and designed with user experience in mind, this system handles everything from flight scheduling to customer management with style.
 
 ## ✨ Features
 
