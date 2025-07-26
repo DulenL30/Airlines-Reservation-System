@@ -1,4 +1,4 @@
-# Airlines Flight Reservation System
+# Airlines Reservation System
 
 ## 🎯 Project Overview
 
